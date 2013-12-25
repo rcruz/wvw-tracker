@@ -621,6 +621,42 @@ View = Backbone.View.extend({
 module.exports = View;
 });
 
+define('lib/views/reset',['require','exports','module'],function (require, exports, module) {
+var View,
+    viewTemplate;
+
+View = Backbone.View.extend({
+    initialize: function () {
+        var view = this;
+        $.get("templates/reset.html", function (data) {
+            viewTemplate = data;
+            view.render();
+        });
+    },
+    render: function () {
+        var template = _.template(viewTemplate, {
+        });
+        this.$el.html(template);
+    },
+    display: function (model) {
+        this.model = model;
+        this.render();
+    },
+    hide: function () {
+        this.$el.hide();
+    },
+    events: {
+        "click #resetBtn": "reset"
+    },
+    reset: function () {
+        localStorage.clear();
+        alert("Cleared")
+    }
+});
+
+module.exports = View;
+});
+
 define('lib/models/scores',['require','exports','module'],function (require, exports, module) {
 var Scores = Backbone.Model.extend({
     sync: function () {
@@ -631,16 +667,18 @@ module.exports = Scores;
 
 });
 
-define('lib/main',['require','exports','module','./views/scores','./views/timeleft','./models/scores'],function (require, exports, module) {
+define('lib/main',['require','exports','module','./views/scores','./views/timeleft','./views/reset','./models/scores'],function (require, exports, module) {
 var ScoresView = require("./views/scores"),
     TimeLeftView = require("./views/timeleft"),
+    ResetView = require("./views/reset"),
     ScoresModel = require("./models/scores");
 
 function onDocumentReady() {
-    var worldName = prompt("Server name?", localStorage && localStorage.worldName || ""),
+    var worldName = localStorage && localStorage.worldName || prompt("Server name?"),
         scoresModel = new ScoresModel({
             worldName: worldName
         });
+
     localStorage.worldName = worldName;
 
     window.views = {};
@@ -653,6 +691,10 @@ function onDocumentReady() {
     window.views.timeleft = new TimeLeftView({
         model: scoresModel,
         el: $("#timeleft")
+    });
+
+    window.views.reset = new ResetView({
+        el: $("#reset")
     });
 }
 

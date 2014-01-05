@@ -28,17 +28,29 @@ module.exports = function (grunt) {
                 // https://github.com/jrburke/r.js/blob/master/build/example.build.js
                 options: {
                     baseUrl: "./",
-                    paths: {},
+                    paths: {
+                    },
                     optimize: "none",
                     generateSourceMaps: false,
                     logLevel: 3,
                     preserveLicenseComments: false,
                     onBuildRead: function (moduleName, path, contents) {
                         var wrappedContents = "define(function (require, exports, module) {\n" + contents + "});\n";
-                        return moduleName === "node_modules/almond/almond" ? contents : wrappedContents;
+                        return this.noWrap.indexOf(moduleName) > -1  ? contents : wrappedContents;
                     },
                     name: "node_modules/almond/almond",
-                    include: ["./lib/main"],
+                    include: [ "./lib/main",
+                        "lib/dependencies/jquery-2.0.3.min",
+                        "lib/dependencies/underscore-min",
+                        "lib/dependencies/backbone-min",
+                        "lib/dependencies/countdown.min",
+                    ],
+                    noWrap: ["node_modules/almond/almond",
+                        "lib/dependencies/jquery-2.0.3.min",
+                        "lib/dependencies/underscore-min",
+                        "lib/dependencies/backbone-min",
+                        "lib/dependencies/countdown.min",
+                    ],
                     insertRequire: ["./lib/main"],
                     out: "public/js/wvw-tracker.js",
                     wrap: true
